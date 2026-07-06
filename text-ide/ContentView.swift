@@ -1,59 +1,104 @@
-//
-//  ContentView.swift
-//  text-ide
-//
-//  Created by Luiz Felipe Scheffer Selau on 06/07/26.
-//
-
 import SwiftUI
 import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Environment(AppState.self) private var appState
 
     var body: some View {
+        @Bindable var appStateBindable = appState
+
         NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200)
-            .toolbar {
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
+            SidebarView()
+                .navigationSplitViewColumnWidth(min: 180, ideal: 220)
         } detail: {
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+            if let project = appState.selectedProject {
+                ProjectDetailView(project: project)
+            } else {
+                VStack(spacing: 12) {
+                    Image(systemName: "folder.badge.questionmark")
+                        .font(.system(size: 48))
+                        .foregroundStyle(.secondary)
+                    Text("Selecione ou crie um projeto")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
+        .toolbar {
+            ToolbarItemGroup {
+                Button(action: { appState.showNewProject() }) {
+                    Label("Novo Projeto", systemImage: "plus")
+                }
+                .keyboardShortcut("n", modifiers: .command)
+
+                Button(action: { appState.showOpenProject() }) {
+                    Label("Abrir Projeto", systemImage: "folder")
+                }
+                .keyboardShortcut("o", modifiers: .command)
+
+                if appState.selectedProject != nil {
+                    Button(action: {
+                        if let project = appState.selectedProject {
+                            appState.showEditProject(project)
+                        }
+                    }) {
+                        Label("Editar Projeto", systemImage: "pencil")
+                    }
+                    .keyboardShortcut("e", modifiers: .command)
+                }
+            }
+        }
+        .sheet(isPresented: $appStateBindable.showingNewProjectSheet) {
+            NewProjectSheet()
+        }
+        .sheet(isPresented: $appStateBindable.showingEditSheet) {
+            if let project = appState.editingProject {
+                EditProjectSheet(project: project)
+            }
+        }
+        .sheet(isPresented: $appStateBindable.showingCreateConfigSheet) {
+            if let folderURL = appState.folderNeedingConfig {
+                CreateConfigSheet(folderURL: folderURL)
+            }
+        }
+        .onChange(of: appState.showingOpenPanel) { _, newValue in
+            if newValue {
+                DispatchQueue.main.async {
+                    openExistingProject()
+                }
+            }
+        }
+    }
+
+    private func openExistingProject() {
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.allowsMultipleSelection = false
+        panel.message = "Selecione a pasta do projeto"
+
+        if panel.runModal() == .OK, let url = panel.url {
+            let service = ProjectService(modelContext: modelContext)
+            do {
+                let result = try service.openExistingProject(folderURL: url)
+                switch result {
+                case .success(let project):
+                    appState.selectedProject = project
+                case .needsConfigCreation(let folderURL):
+                    appState.showCreateConfig(for: folderURL)
+                }
+            } catch {
+                print("🔴 Erro ao abrir projeto: \(error)")
+            }
+        }
+        appState.showingOpenPanel = false
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .modelContainer(for: Project.self, inMemory: true)
+        .environment(AppState())
 }
