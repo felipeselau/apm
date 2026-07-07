@@ -10,12 +10,14 @@ struct NewProjectSheet: View {
     @State private var errorMessage: String?
 
     var body: some View {
-        VStack(spacing: 20) {
-            Text("Novo Projeto")
-                .font(.title2)
-                .fontWeight(.semibold)
+        VStack(spacing: Spacing.xl) {
+            ProjectIconView(
+                initials: previewInitials,
+                colorHex: selectedColorHex,
+                size: 56
+            )
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: Spacing.sm) {
                 Text("Nome do Projeto")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -23,11 +25,11 @@ struct NewProjectSheet: View {
                     .textFieldStyle(.roundedBorder)
             }
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: Spacing.sm) {
                 Text("Cor do Ícone")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                HStack(spacing: 8) {
+                HStack(spacing: Spacing.sm) {
                     ForEach(ProjectService.availableColors, id: \.self) { colorHex in
                         Circle()
                             .fill(Color(hex: colorHex))
@@ -43,7 +45,7 @@ struct NewProjectSheet: View {
                 }
             }
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: Spacing.sm) {
                 Text("Pasta do Projeto")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -54,9 +56,9 @@ struct NewProjectSheet: View {
                             .foregroundStyle(folderURL == nil ? .secondary : .primary)
                         Spacer()
                     }
-                    .padding(8)
+                    .padding(Spacing.sm)
                     .background(Color.secondary.opacity(0.1))
-                    .cornerRadius(6)
+                    .clipShape(RoundedRectangle(cornerRadius: Radii.sm))
                 }
             }
 
@@ -81,8 +83,18 @@ struct NewProjectSheet: View {
                 .disabled(projectName.isEmpty || folderURL == nil)
             }
         }
-        .padding(24)
+        .padding(Spacing.xl)
         .frame(width: 360)
+    }
+
+    private var previewInitials: String {
+        let trimmed = projectName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return "?" }
+        let parts = trimmed.split(separator: " ")
+        if parts.count >= 2 {
+            return String(parts[0].prefix(1) + parts[1].prefix(1)).uppercased()
+        }
+        return String(trimmed.prefix(2)).uppercased()
     }
 
     private func selectFolder() {

@@ -13,6 +13,7 @@ final class AppState {
     var showingOnboarding = false
     var showingAccountSheet = false
     var showingSettingsSheet = false
+    var settings: AppSettings = AppSettings()
 
     func showNewProject() {
         showingNewProjectSheet = true

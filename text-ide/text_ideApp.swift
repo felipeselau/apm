@@ -5,6 +5,14 @@ import SwiftData
 struct text_ideApp: App {
     @State private var appState = AppState()
 
+    private var colorScheme: ColorScheme? {
+        switch appState.settings.theme {
+        case "light": return .light
+        case "dark": return .dark
+        default: return nil
+        }
+    }
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Project.self,
@@ -26,7 +34,9 @@ struct text_ideApp: App {
         WindowGroup {
             ContentView()
                 .environment(appState)
+                .preferredColorScheme(colorScheme)
                 .onAppear {
+                    appState.settings = APMFileManager.shared.loadSettings()
                     appState.loadAccount()
                     if !appState.hasAccount() {
                         appState.showingOnboarding = true

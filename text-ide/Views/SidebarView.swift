@@ -16,38 +16,46 @@ struct SidebarView: View {
                 get: { appState.selectedProject },
                 set: { appState.selectedProject = $0 }
             )) {
-                ForEach(sortedProjects) { project in
-                    HStack(spacing: 10) {
-                        ProjectIconView(
-                            initials: project.initials,
-                            colorHex: project.iconColorHex,
-                            size: 28,
-                            isSelected: false
-                        )
-                        Text(project.name)
-                            .lineLimit(1)
-                    }
-                    .tag(project)
-                    .contextMenu {
-                        Button("Editar", systemImage: "pencil") {
-                            appState.showEditProject(project)
+                Section("Projetos") {
+                    ForEach(sortedProjects) { project in
+                        HStack(spacing: Spacing.sm) {
+                            ProjectIconView(
+                                initials: project.initials,
+                                colorHex: project.iconColorHex,
+                                size: 28,
+                                isSelected: false
+                            )
+                            Text(project.name)
+                                .lineLimit(1)
                         }
-                        Divider()
-                        Button("Remover", systemImage: "trash", role: .destructive) {
-                            projectToDelete = project
-                            showingDeleteConfirmation = true
+                        .tag(project)
+                        .listRowInsets(EdgeInsets(
+                            top: Spacing.xs,
+                            leading: Spacing.md,
+                            bottom: Spacing.xs,
+                            trailing: Spacing.md
+                        ))
+                        .contextMenu {
+                            Button("Editar", systemImage: "pencil") {
+                                appState.showEditProject(project)
+                            }
+                            Divider()
+                            Button("Remover", systemImage: "trash", role: .destructive) {
+                                projectToDelete = project
+                                showingDeleteConfirmation = true
+                            }
                         }
                     }
-                }
-                .onMove { source, destination in
-                    moveProjects(from: source, to: destination)
+                    .onMove { source, destination in
+                        moveProjects(from: source, to: destination)
+                    }
                 }
             }
             .listStyle(.sidebar)
 
             Divider()
 
-            VStack(spacing: 4) {
+            VStack(spacing: Spacing.xs) {
                 Button(action: {
                     if appState.hasAccount() {
                         appState.showingAccountSheet = true
@@ -55,19 +63,20 @@ struct SidebarView: View {
                         appState.showingOnboarding = true
                     }
                 }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "person.circle")
-                            .font(.system(size: 14))
+                    HStack(spacing: Spacing.sm) {
                         if let account = appState.account {
+                            AccountAvatar(name: account.name, size: 24)
                             Text(account.name)
                                 .lineLimit(1)
                         } else {
+                            Image(systemName: "person.circle")
+                                .font(.system(size: 14))
                             Text("Configurar Conta")
                         }
                         Spacer()
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
+                    .padding(.horizontal, Spacing.md)
+                    .padding(.vertical, Spacing.sm)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -75,19 +84,19 @@ struct SidebarView: View {
                 Button(action: {
                     appState.showingSettingsSheet = true
                 }) {
-                    HStack(spacing: 8) {
+                    HStack(spacing: Spacing.sm) {
                         Image(systemName: "gearshape")
                             .font(.system(size: 14))
                         Text("Ajustes")
                         Spacer()
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
+                    .padding(.horizontal, Spacing.md)
+                    .padding(.vertical, Spacing.sm)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
             }
-            .padding(.vertical, 8)
+            .padding(.vertical, Spacing.sm)
         }
         .alert("Remover Projeto", isPresented: $showingDeleteConfirmation) {
             Button("Cancelar", role: .cancel) {
@@ -120,5 +129,29 @@ struct SidebarView: View {
         reordered.move(fromOffsets: source, toOffset: destination)
         let service = ProjectService(modelContext: modelContext)
         try? service.reorderProjects(reordered)
+    }
+}
+
+struct AccountAvatar: View {
+    let name: String
+    var size: CGFloat = 24
+
+    private var initials: String {
+        let parts = name.split(separator: " ")
+        if parts.count >= 2 {
+            return String(parts[0].prefix(1) + parts[1].prefix(1)).uppercased()
+        }
+        return String(name.prefix(2)).uppercased()
+    }
+
+    var body: some View {
+        Circle()
+            .fill(Color.accentColor)
+            .frame(width: size, height: size)
+            .overlay(
+                Text(initials)
+                    .font(.system(size: size * 0.4, weight: .semibold))
+                    .foregroundStyle(.white)
+            )
     }
 }

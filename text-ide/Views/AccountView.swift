@@ -9,11 +9,11 @@ struct AccountView: View {
     @State private var email = ""
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: Spacing.xl) {
             if let account = appState.account {
                 if isEditing {
-                    VStack(spacing: 16) {
-                        VStack(alignment: .leading, spacing: 6) {
+                    VStack(spacing: Spacing.lg) {
+                        VStack(alignment: .leading, spacing: Spacing.sm) {
                             Text("Nome")
                                 .font(.caption)
                                 .fontWeight(.medium)
@@ -22,7 +22,7 @@ struct AccountView: View {
                                 .textFieldStyle(.roundedBorder)
                         }
 
-                        VStack(alignment: .leading, spacing: 6) {
+                        VStack(alignment: .leading, spacing: Spacing.sm) {
                             Text("Email")
                                 .font(.caption)
                                 .fontWeight(.medium)
@@ -47,15 +47,12 @@ struct AccountView: View {
                     }
                     .frame(width: 280)
                 } else {
-                    VStack(spacing: 16) {
-                        Image(systemName: "person.crop.circle.fill")
-                            .font(.system(size: 48))
-                            .foregroundStyle(.tint)
+                    VStack(spacing: Spacing.lg) {
+                        AccountAvatar(name: account.name, size: 64)
 
-                        VStack(spacing: 4) {
+                        VStack(spacing: Spacing.xs) {
                             Text(account.name)
-                                .font(.title2)
-                                .fontWeight(.semibold)
+                                .font(.system(size: Typography.headingSize, weight: .semibold))
 
                             Text(account.email)
                                 .font(.subheadline)
@@ -89,7 +86,7 @@ struct AccountView: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .padding(24)
+        .padding(Spacing.xl)
     }
 
     private func resetFields() {

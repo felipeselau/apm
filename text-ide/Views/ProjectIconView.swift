@@ -7,7 +7,7 @@ struct ProjectIconView: View {
     var isSelected: Bool = false
 
     var body: some View {
-        RoundedRectangle(cornerRadius: 8)
+        RoundedRectangle(cornerRadius: Radii.md)
             .fill(Color(hex: colorHex))
             .frame(width: size, height: size)
             .overlay(
@@ -16,7 +16,7 @@ struct ProjectIconView: View {
                     .foregroundStyle(.white)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: Radii.md)
                     .stroke(isSelected ? Color.white.opacity(0.6) : Color.clear, lineWidth: 2)
             )
     }

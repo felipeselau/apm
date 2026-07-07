@@ -17,15 +17,16 @@ struct CreateConfigSheet: View {
     }
 
     var body: some View {
-        VStack(spacing: 20) {
-            VStack(spacing: 8) {
-                Image(systemName: "folder.badge.gearshape")
-                    .font(.system(size: 40))
-                    .foregroundStyle(.secondary)
+        VStack(spacing: Spacing.xl) {
+            VStack(spacing: Spacing.sm) {
+                ProjectIconView(
+                    initials: previewInitials,
+                    colorHex: selectedColorHex,
+                    size: 56
+                )
 
                 Text("Configurar Projeto")
-                    .font(.title2)
-                    .fontWeight(.semibold)
+                    .font(.system(size: Typography.headingSize, weight: .semibold))
 
                 Text("A pasta '\(folderURL.lastPathComponent)' não possui configuração.\nCrie um arquivo .textide.json para continuar.")
                     .font(.caption)
@@ -33,7 +34,7 @@ struct CreateConfigSheet: View {
                     .multilineTextAlignment(.center)
             }
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: Spacing.sm) {
                 Text("Nome do Projeto")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -41,11 +42,11 @@ struct CreateConfigSheet: View {
                     .textFieldStyle(.roundedBorder)
             }
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: Spacing.sm) {
                 Text("Cor do Ícone")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                HStack(spacing: 8) {
+                HStack(spacing: Spacing.sm) {
                     ForEach(ProjectService.availableColors, id: \.self) { colorHex in
                         Circle()
                             .fill(Color(hex: colorHex))
@@ -82,8 +83,18 @@ struct CreateConfigSheet: View {
                 .disabled(projectName.isEmpty)
             }
         }
-        .padding(24)
+        .padding(Spacing.xl)
         .frame(width: 380)
+    }
+
+    private var previewInitials: String {
+        let trimmed = projectName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return "?" }
+        let parts = trimmed.split(separator: " ")
+        if parts.count >= 2 {
+            return String(parts[0].prefix(1) + parts[1].prefix(1)).uppercased()
+        }
+        return String(trimmed.prefix(2)).uppercased()
     }
 
     private func createConfig() {

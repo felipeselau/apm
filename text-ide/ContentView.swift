@@ -13,9 +13,9 @@ struct ContentView: View {
                 .navigationSplitViewColumnWidth(min: 180, ideal: 220)
         } detail: {
             if let project = appState.selectedProject {
-                ProjectDetailView(project: project)
+                WorkspaceView(project: project)
             } else {
-                VStack(spacing: 12) {
+                VStack(spacing: Spacing.md) {
                     Image(systemName: "folder.badge.questionmark")
                         .font(.system(size: 48))
                         .foregroundStyle(.secondary)

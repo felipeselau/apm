@@ -10,24 +10,25 @@ struct OnboardingView: View {
     @State private var errorMessage = ""
 
     var body: some View {
-        VStack(spacing: 24) {
-            VStack(spacing: 8) {
-                Image(systemName: "person.crop.circle.badge.plus")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.tint)
+        VStack(spacing: Spacing.xl) {
+            VStack(spacing: Spacing.md) {
+                ProjectIconView(
+                    initials: "APM",
+                    colorHex: "#4A90D9",
+                    size: 72
+                )
 
-                Text("Bem-vindo ao TextIDE")
-                    .font(.title)
-                    .fontWeight(.bold)
+                Text("Bem-vindo ao APM")
+                    .font(.system(size: Typography.titleSize, weight: .bold))
 
                 Text("Crie seu perfil para começar")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-            .padding(.top, 20)
+            .padding(.top, Spacing.xl)
 
-            VStack(spacing: 16) {
-                VStack(alignment: .leading, spacing: 6) {
+            VStack(spacing: Spacing.lg) {
+                VStack(alignment: .leading, spacing: Spacing.sm) {
                     Text("Nome")
                         .font(.caption)
                         .fontWeight(.medium)
@@ -36,7 +37,7 @@ struct OnboardingView: View {
                         .textFieldStyle(.roundedBorder)
                 }
 
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: Spacing.sm) {
                     Text("Email")
                         .font(.caption)
                         .fontWeight(.medium)
@@ -57,10 +58,10 @@ struct OnboardingView: View {
                 Text("Criar Perfil")
                     .fontWeight(.semibold)
                     .frame(width: 280)
-                    .padding(.vertical, 8)
+                    .padding(.vertical, Spacing.sm)
             }
             .buttonStyle(.borderedProminent)
-            .padding(.bottom, 20)
+            .padding(.bottom, Spacing.xl)
         }
         .frame(width: 360)
     }
