@@ -5,12 +5,18 @@ struct ProjectConfig: Codable {
     var iconColor: String
     var createdAt: Date
     var recentFiles: [String]
+    var terminal: TerminalConfig?
+    var preview: PreviewConfig?
+    var projectType: String?
 
-    init(name: String, iconColor: String, createdAt: Date = Date(), recentFiles: [String] = []) {
+    init(name: String, iconColor: String, createdAt: Date = Date(), recentFiles: [String] = [], terminal: TerminalConfig? = nil, preview: PreviewConfig? = nil, projectType: String? = nil) {
         self.name = name
         self.iconColor = iconColor
         self.createdAt = createdAt
         self.recentFiles = recentFiles
+        self.terminal = terminal
+        self.preview = preview
+        self.projectType = projectType
     }
 
     func writeTo(url: URL) throws {

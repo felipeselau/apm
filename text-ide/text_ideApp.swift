@@ -28,6 +28,14 @@ struct text_ideApp: App {
 
     init() {
         APMFileManager.shared.ensureAPMDirectory()
+        registerBundledFont()
+    }
+
+    private func registerBundledFont() {
+        guard let fontURL = Bundle.main.url(forResource: "JetBrainsMonoNerdFontMono-Regular", withExtension: "ttf"),
+              let provider = CGDataProvider(url: fontURL as CFURL),
+              let font = CGFont(provider) else { return }
+        CTFontManagerRegisterGraphicsFont(font, nil)
     }
 
     var body: some Scene {
@@ -47,12 +55,12 @@ struct text_ideApp: App {
         .windowStyle(.hiddenTitleBar)
         .commands {
             CommandGroup(replacing: .newItem) {
-                Button("Novo Projeto...") {
+                Button("Novo Projeto") {
                     appState.showNewProject()
                 }
                 .keyboardShortcut("n", modifiers: .command)
 
-                Button("Abrir Projeto...") {
+                Button("Abrir Projeto") {
                     appState.showOpenProject()
                 }
                 .keyboardShortcut("o", modifiers: .command)
@@ -64,6 +72,13 @@ struct text_ideApp: App {
                     }
                     .keyboardShortcut("e", modifiers: .command)
                 }
+            }
+
+            CommandMenu("Editar") {
+                Button("Salvar") {
+                    NotificationCenter.default.post(name: .saveFile, object: nil)
+                }
+                .keyboardShortcut("s", modifiers: .command)
             }
         }
     }

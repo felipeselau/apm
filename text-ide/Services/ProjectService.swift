@@ -121,10 +121,14 @@ final class ProjectService {
         let configURL = folderURL.appendingPathComponent(".textide.json")
 
         try withSecurityScopedAccess(to: folderURL) {
+            let existingConfig = try? ProjectConfig.readFrom(url: configURL)
             let config = ProjectConfig(
                 name: name,
                 iconColor: iconColorHex,
-                createdAt: project.createdAt
+                createdAt: project.createdAt,
+                recentFiles: existingConfig?.recentFiles ?? [],
+                terminal: existingConfig?.terminal,
+                preview: existingConfig?.preview
             )
             try config.writeTo(url: configURL)
         }
@@ -170,6 +174,59 @@ final class ProjectService {
         } catch {
             print("🔴 Erro ao ler config: \(error)")
             return nil
+        }
+    }
+
+    func readTerminalConfig(from project: Project) -> TerminalConfig? {
+        readConfig(from: project)?.terminal
+    }
+
+    func readPreviewConfig(from project: Project) -> PreviewConfig? {
+        readConfig(from: project)?.preview
+    }
+
+    func updatePreviewConfig(for project: Project, preview: PreviewConfig?) throws {
+        let folderURL = try restoreFolderURL(from: project)
+        let configURL = folderURL.appendingPathComponent(".textide.json")
+
+        try withSecurityScopedAccess(to: folderURL) {
+            var config = (try? ProjectConfig.readFrom(url: configURL)) ?? ProjectConfig(
+                name: project.name,
+                iconColor: project.iconColorHex,
+                createdAt: project.createdAt
+            )
+            config.preview = preview
+            try config.writeTo(url: configURL)
+        }
+    }
+
+    func updateProjectType(for project: Project, type: ProjectType) throws {
+        let folderURL = try restoreFolderURL(from: project)
+        let configURL = folderURL.appendingPathComponent(".textide.json")
+
+        try withSecurityScopedAccess(to: folderURL) {
+            var config = (try? ProjectConfig.readFrom(url: configURL)) ?? ProjectConfig(
+                name: project.name,
+                iconColor: project.iconColorHex,
+                createdAt: project.createdAt
+            )
+            config.projectType = type.rawValue
+            try config.writeTo(url: configURL)
+        }
+    }
+
+    func updateTerminalConfig(for project: Project, terminal: TerminalConfig?) throws {
+        let folderURL = try restoreFolderURL(from: project)
+        let configURL = folderURL.appendingPathComponent(".textide.json")
+
+        try withSecurityScopedAccess(to: folderURL) {
+            var config = (try? ProjectConfig.readFrom(url: configURL)) ?? ProjectConfig(
+                name: project.name,
+                iconColor: project.iconColorHex,
+                createdAt: project.createdAt
+            )
+            config.terminal = terminal
+            try config.writeTo(url: configURL)
         }
     }
 

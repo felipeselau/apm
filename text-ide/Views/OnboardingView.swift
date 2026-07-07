@@ -54,13 +54,21 @@ struct OnboardingView: View {
                     .foregroundStyle(.red)
             }
 
-            Button(action: createAccount) {
-                Text("Criar Perfil")
-                    .fontWeight(.semibold)
-                    .frame(width: 280)
-                    .padding(.vertical, Spacing.sm)
+            HStack(spacing: Spacing.md) {
+                Button("Pular") {
+                    appState.showingOnboarding = false
+                    dismiss()
+                }
+                .keyboardShortcut(.escape)
+
+                Button(action: createAccount) {
+                    Text("Criar Perfil")
+                        .fontWeight(.semibold)
+                        .frame(width: 200)
+                        .padding(.vertical, Spacing.sm)
+                }
+                .buttonStyle(.borderedProminent)
             }
-            .buttonStyle(.borderedProminent)
             .padding(.bottom, Spacing.xl)
         }
         .frame(width: 360)
