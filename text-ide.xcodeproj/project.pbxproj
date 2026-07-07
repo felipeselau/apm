@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		BC43AE432FFD6C7700DD2C14 /* SwiftTerm in Frameworks */ = {isa = PBXBuildFile; productRef = BC7E1E442FFC26CF005E1F0E /* SwiftTerm */; };
+		BCCE00032FFD700000AAAAAA /* CodeEditSourceEditor in Frameworks */ = {isa = PBXBuildFile; productRef = BCCE00022FFD700000AAAAAA /* CodeEditSourceEditor */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		BC7E1E272FFC26CF005E1F0E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +57,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BC43AE432FFD6C7700DD2C14 /* SwiftTerm in Frameworks */,
+				BCCE00032FFD700000AAAAAA /* CodeEditSourceEditor in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +119,8 @@
 			);
 			name = "text-ide";
 			packageProductDependencies = (
+				BC7E1E442FFC26CF005E1F0E /* SwiftTerm */,
+				BCCE00022FFD700000AAAAAA /* CodeEditSourceEditor */,
 			);
 			productName = "text-ide";
 			productReference = BC7E1E172FFC26CE005E1F0E /* text-ide.app */;
@@ -195,6 +204,10 @@
 			);
 			mainGroup = BC7E1E0E2FFC26CE005E1F0E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				BC7E1E432FFC26CF005E1F0E /* XCRemoteSwiftPackageReference "SwiftTerm" */,
+				BCCE00012FFD700000AAAAAA /* XCRemoteSwiftPackageReference "CodeEditSourceEditor" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BC7E1E182FFC26CE005E1F0E /* Products */;
 			projectDirPath = "";
@@ -399,7 +412,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P3NF9Z8K9G;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readwrite;
@@ -434,7 +447,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P3NF9Z8K9G;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readwrite;
@@ -579,6 +592,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BC7E1E432FFC26CF005E1F0E /* XCRemoteSwiftPackageReference "SwiftTerm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/migueldeicaza/SwiftTerm";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		BCCE00012FFD700000AAAAAA /* XCRemoteSwiftPackageReference "CodeEditSourceEditor" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/codeeditapp/CodeEditSourceEditor";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.13.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BC7E1E442FFC26CF005E1F0E /* SwiftTerm */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BC7E1E432FFC26CF005E1F0E /* XCRemoteSwiftPackageReference "SwiftTerm" */;
+			productName = SwiftTerm;
+		};
+		BCCE00022FFD700000AAAAAA /* CodeEditSourceEditor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BCCE00012FFD700000AAAAAA /* XCRemoteSwiftPackageReference "CodeEditSourceEditor" */;
+			productName = CodeEditSourceEditor;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BC7E1E0F2FFC26CE005E1F0E /* Project object */;
 }
