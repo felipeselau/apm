@@ -18,10 +18,20 @@ struct text_ideApp: App {
         }
     }()
 
+    init() {
+        APMFileManager.shared.ensureAPMDirectory()
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(appState)
+                .onAppear {
+                    appState.loadAccount()
+                    if !appState.hasAccount() {
+                        appState.showingOnboarding = true
+                    }
+                }
         }
         .modelContainer(sharedModelContainer)
         .windowStyle(.hiddenTitleBar)

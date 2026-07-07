@@ -9,6 +9,10 @@ final class AppState {
     var showingEditSheet = false
     var folderNeedingConfig: URL?
     var showingCreateConfigSheet = false
+    var account: AccountInfo?
+    var showingOnboarding = false
+    var showingAccountSheet = false
+    var showingSettingsSheet = false
 
     func showNewProject() {
         showingNewProjectSheet = true
@@ -26,5 +30,13 @@ final class AppState {
     func showCreateConfig(for folderURL: URL) {
         folderNeedingConfig = folderURL
         showingCreateConfigSheet = true
+    }
+
+    func loadAccount() {
+        account = APMFileManager.shared.loadAccount()
+    }
+
+    func hasAccount() -> Bool {
+        account != nil
     }
 }

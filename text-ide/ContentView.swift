@@ -63,6 +63,16 @@ struct ContentView: View {
                 CreateConfigSheet(folderURL: folderURL)
             }
         }
+        .sheet(isPresented: $appStateBindable.showingOnboarding) {
+            OnboardingView()
+                .interactiveDismissDisabled()
+        }
+        .sheet(isPresented: $appStateBindable.showingAccountSheet) {
+            AccountView()
+        }
+        .sheet(isPresented: $appStateBindable.showingSettingsSheet) {
+            SettingsView()
+        }
         .onChange(of: appState.showingOpenPanel) { _, newValue in
             if newValue {
                 DispatchQueue.main.async {
