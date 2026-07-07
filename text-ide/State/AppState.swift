@@ -14,6 +14,26 @@ final class AppState {
     var showingAccountSheet = false
     var showingSettingsSheet = false
     var settings: AppSettings = AppSettings()
+    var showingTerminalConfigSheet = false
+    var terminalConfigProject: Project?
+    var showingPreviewSettingsSheet = false
+
+    // Toast
+    var toast: ToastMessage?
+
+    struct ToastMessage: Identifiable {
+        let id = UUID()
+        let message: String
+        let type: ToastType
+
+        enum ToastType {
+            case error, success, info
+        }
+    }
+
+    func showToast(_ message: String, type: ToastMessage.ToastType = .info) {
+        toast = ToastMessage(message: message, type: type)
+    }
 
     func showNewProject() {
         showingNewProjectSheet = true

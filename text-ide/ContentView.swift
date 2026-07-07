@@ -5,6 +5,8 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(AppState.self) private var appState
 
+    @State private var showingQuickOpen = false
+
     var body: some View {
         @Bindable var appStateBindable = appState
 
@@ -14,20 +16,51 @@ struct ContentView: View {
         } detail: {
             if let project = appState.selectedProject {
                 WorkspaceView(project: project)
+                    .navigationTitle(project.name)
             } else {
-                VStack(spacing: Spacing.md) {
+                VStack(spacing: Spacing.lg) {
                     Image(systemName: "folder.badge.questionmark")
                         .font(.system(size: 48))
                         .foregroundStyle(.secondary)
-                    Text("Selecione ou crie um projeto")
+                    Text("Nenhum projeto aberto")
                         .font(.title3)
                         .foregroundStyle(.secondary)
+
+                    HStack(spacing: Spacing.md) {
+                        Button(action: { appState.showNewProject() }) {
+                            Label("Novo Projeto", systemImage: "plus")
+                                .frame(width: 140)
+                        }
+                        .buttonStyle(.borderedProminent)
+
+                        Button(action: { appState.showOpenProject() }) {
+                            Label("Abrir Projeto", systemImage: "folder")
+                                .frame(width: 140)
+                        }
+                        .buttonStyle(.bordered)
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
+        .overlay(alignment: .bottom) {
+            if let toast = appState.toast {
+                ToastView(toast: toast) {
+                    appState.toast = nil
+                }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .animation(.spring(), value: appState.toast?.id)
+        .background(
+            Button("") {
+                appState.selectedProject = nil
+            }
+            .keyboardShortcut("w", modifiers: .command)
+            .opacity(0)
+        )
         .toolbar {
-            ToolbarItemGroup {
+            ToolbarItemGroup(placement: .primaryAction) {
                 Button(action: { appState.showNewProject() }) {
                     Label("Novo Projeto", systemImage: "plus")
                 }
@@ -37,17 +70,6 @@ struct ContentView: View {
                     Label("Abrir Projeto", systemImage: "folder")
                 }
                 .keyboardShortcut("o", modifiers: .command)
-
-                if appState.selectedProject != nil {
-                    Button(action: {
-                        if let project = appState.selectedProject {
-                            appState.showEditProject(project)
-                        }
-                    }) {
-                        Label("Editar Projeto", systemImage: "pencil")
-                    }
-                    .keyboardShortcut("e", modifiers: .command)
-                }
             }
         }
         .sheet(isPresented: $appStateBindable.showingNewProjectSheet) {
@@ -73,10 +95,37 @@ struct ContentView: View {
         .sheet(isPresented: $appStateBindable.showingSettingsSheet) {
             SettingsView()
         }
+        .sheet(isPresented: $appStateBindable.showingTerminalConfigSheet) {
+            if let project = appState.terminalConfigProject {
+                TerminalConfigSheet(project: project)
+            }
+        }
+        .sheet(isPresented: $appStateBindable.showingPreviewSettingsSheet) {
+            if let project = appState.selectedProject {
+                PreviewSettingsSheet(project: project)
+            }
+        }
         .onChange(of: appState.showingOpenPanel) { _, newValue in
             if newValue {
                 DispatchQueue.main.async {
                     openExistingProject()
+                }
+            }
+        }
+        .background(
+            Button("") {
+                showingQuickOpen = true
+            }
+            .keyboardShortcut("p", modifiers: [.command])
+            .opacity(0)
+        )
+        .sheet(isPresented: $showingQuickOpen) {
+            if let project = appState.selectedProject {
+                QuickOpenView(project: project) { url in
+                    let service = FileBrowserService(project: project, modelContext: modelContext)
+                    if let content = try? service.readFile(at: url) {
+                        NotificationCenter.default.post(name: .openFile, object: url, userInfo: ["content": content])
+                    }
                 }
             }
         }

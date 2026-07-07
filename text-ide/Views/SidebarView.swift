@@ -7,11 +7,49 @@ struct SidebarView: View {
     @Query private var projects: [Project]
     @State private var projectToDelete: Project?
     @State private var showingDeleteConfirmation = false
+    @State private var hoveredButton: String?
 
     var body: some View {
         let sortedProjects = projects.sorted { $0.effectiveSortOrder < $1.effectiveSortOrder }
         
         VStack(spacing: 0) {
+            if let project = appState.selectedProject {
+                HStack(spacing: Spacing.sm) {
+                    ProjectIconView(initials: project.initials, colorHex: project.iconColorHex, size: 24, isSelected: false)
+                    Text(project.name)
+                        .font(.system(size: Typography.headingSize, weight: .semibold))
+                        .lineLimit(1)
+                    Spacer()
+                    Menu {
+                        Button("Editar Projeto", systemImage: "pencil") {
+                            appState.showEditProject(project)
+                        }
+                        Button("Configuração do Terminal", systemImage: "terminal") {
+                            appState.terminalConfigProject = project
+                            appState.showingTerminalConfigSheet = true
+                        }
+                        Divider()
+                        Button("Fechar Projeto", systemImage: "rectangle.portrait.and.arrow.right") {
+                            appState.selectedProject = nil
+                        }
+                        Divider()
+                        Button("Remover Projeto", systemImage: "trash", role: .destructive) {
+                            projectToDelete = project
+                            showingDeleteConfirmation = true
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .font(.system(size: 14))
+                            .foregroundStyle(.secondary)
+                    }
+                    .menuStyle(.borderlessButton)
+                    .fixedSize()
+                }
+                .padding(.horizontal, Spacing.md)
+                .padding(.vertical, Spacing.sm)
+                .background(Color(nsColor: .controlBackgroundColor))
+            }
+
             List(selection: Binding(
                 get: { appState.selectedProject },
                 set: { appState.selectedProject = $0 }
@@ -78,8 +116,12 @@ struct SidebarView: View {
                     .padding(.horizontal, Spacing.md)
                     .padding(.vertical, Spacing.sm)
                     .contentShape(Rectangle())
+                    .background(hoveredButton == "account" ? Color.primary.opacity(0.06) : Color.clear)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.borderless)
+                .onHover { hovering in
+                    hoveredButton = hovering ? "account" : nil
+                }
 
                 Button(action: {
                     appState.showingSettingsSheet = true
@@ -93,8 +135,12 @@ struct SidebarView: View {
                     .padding(.horizontal, Spacing.md)
                     .padding(.vertical, Spacing.sm)
                     .contentShape(Rectangle())
+                    .background(hoveredButton == "settings" ? Color.primary.opacity(0.06) : Color.clear)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.borderless)
+                .onHover { hovering in
+                    hoveredButton = hovering ? "settings" : nil
+                }
             }
             .padding(.vertical, Spacing.sm)
         }
