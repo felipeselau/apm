@@ -10,6 +10,7 @@ final class Project {
     var createdAt: Date
     var lastOpenedAt: Date
     var securityBookmark: Data?
+    var sortOrder: Int?
 
     init(
         id: UUID = UUID(),
@@ -18,7 +19,8 @@ final class Project {
         iconColorHex: String,
         createdAt: Date = Date(),
         lastOpenedAt: Date = Date(),
-        securityBookmark: Data? = nil
+        securityBookmark: Data? = nil,
+        sortOrder: Int? = nil
     ) {
         self.id = id
         self.name = name
@@ -27,6 +29,11 @@ final class Project {
         self.createdAt = createdAt
         self.lastOpenedAt = lastOpenedAt
         self.securityBookmark = securityBookmark
+        self.sortOrder = sortOrder
+    }
+
+    var effectiveSortOrder: Int {
+        sortOrder ?? 0
     }
 
     var initials: String {

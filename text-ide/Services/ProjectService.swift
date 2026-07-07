@@ -35,15 +35,20 @@ final class ProjectService {
             throw error
         }
 
+        let maxSortOrder = getMaxSortOrder()
         let project = Project(
             name: name,
             folderPath: folderURL.path,
             iconColorHex: iconColorHex,
-            securityBookmark: bookmark
+            securityBookmark: bookmark,
+            sortOrder: maxSortOrder + 1
         )
         modelContext.insert(project)
         try modelContext.save()
         print("🔵 Projeto salvo no SwiftData")
+
+        try? APMFileManager.shared.addProjectRelation(project)
+
         return project
     }
 
@@ -59,15 +64,20 @@ final class ProjectService {
                 try ProjectConfig.readFrom(url: configURL)
             }
             let bookmark = try createBookmark(for: folderURL)
+            let maxSortOrder = getMaxSortOrder()
             let project = Project(
                 name: config.name,
                 folderPath: folderURL.path,
                 iconColorHex: config.iconColor,
                 createdAt: config.createdAt,
-                securityBookmark: bookmark
+                securityBookmark: bookmark,
+                sortOrder: maxSortOrder + 1
             )
             modelContext.insert(project)
             try modelContext.save()
+
+            try? APMFileManager.shared.addProjectRelation(project)
+
             return .success(project)
         } else {
             return .needsConfigCreation(folderURL)
@@ -83,20 +93,27 @@ final class ProjectService {
             try config.writeTo(url: configURL)
         }
 
+        let maxSortOrder = getMaxSortOrder()
         let project = Project(
             name: name,
             folderPath: folderURL.path,
             iconColorHex: iconColorHex,
-            securityBookmark: bookmark
+            securityBookmark: bookmark,
+            sortOrder: maxSortOrder + 1
         )
         modelContext.insert(project)
         try modelContext.save()
+
+        try? APMFileManager.shared.addProjectRelation(project)
+
         return project
     }
 
     func removeProject(_ project: Project) throws {
         modelContext.delete(project)
         try modelContext.save()
+
+        try? APMFileManager.shared.removeProjectRelation(id: project.id)
     }
 
     func updateProject(_ project: Project, name: String, iconColorHex: String) throws {
@@ -115,11 +132,32 @@ final class ProjectService {
         project.name = name
         project.iconColorHex = iconColorHex
         try modelContext.save()
+
+        try? APMFileManager.shared.updateProjectRelation(project)
     }
 
     func updateLastOpened(_ project: Project) throws {
         project.lastOpenedAt = Date()
         try modelContext.save()
+
+        try? APMFileManager.shared.updateProjectRelation(project)
+    }
+
+    func reorderProjects(_ projects: [Project]) throws {
+        for (index, project) in projects.enumerated() {
+            project.sortOrder = index
+        }
+        try modelContext.save()
+
+        try? APMFileManager.shared.saveProjectRelations(projects.map { ProjectRelation(from: $0) })
+    }
+
+    private func getMaxSortOrder() -> Int {
+        let descriptor = FetchDescriptor<Project>(sortBy: [SortDescriptor(\.sortOrder, order: .reverse)])
+        if let lastProject = try? modelContext.fetch(descriptor).first {
+            return lastProject.effectiveSortOrder
+        }
+        return -1
     }
 
     func readConfig(from project: Project) -> ProjectConfig? {
